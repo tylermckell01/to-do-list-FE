@@ -1,14 +1,15 @@
+import AllTasks from './AllTasks';
 import './styles/App.css';
 import { useState, useEffect } from 'react';
 
 function App() {
 
-  const [allTasks] = useState([]);
   const [taskName, setTaskName] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     alert(`the name you entered was: ${taskName}`);
+
 
     setTaskName("");
   }
@@ -21,7 +22,7 @@ function App() {
         <form onSubmit={handleSubmit}>
 
           <label>
-            new task name:
+            new task:
             <input 
               type='text' 
               value={taskName}
@@ -32,6 +33,7 @@ function App() {
         </form>
 
       </div>
+      <AllTasks/>
     </div>
   );
 }
