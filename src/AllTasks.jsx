@@ -3,20 +3,25 @@ import { useState, useEffect } from 'react';
 
 function AllTasks() {
 
-    const dummyTasks = [
-        { task_id: 1, task_name: "Buy groceries", task_status: "pending" },
-        { task_id: 2, task_name: "Finish project report", task_status: "in progress" },
-        { task_id: 3, task_name: "Workout for 1 hour", task_status: "completed" },
-        { task_id: 4, task_name: "Call mom", task_status: "pending" },
-        { task_id: 5, task_name: "Read 10 pages of a book", task_status: "in progress" }
-      ];
 
-
-    const [allTasks, setAllTasks] = useState(dummyTasks);
-    const [isEditing, setIsEditing] = useState(false);
+    const [allTasks, setAllTasks] = useState([]);
     const [editingTaskId, setEditingTaskId] = useState(null);
     const [editedTaskName, setEditedTaskName] = useState("");
     const [editedTaskStatus, setEditedTaskStatus] = useState("");
+
+
+    // fetch all tasks
+    useEffect(() => {
+        fetch("http://127.0.0.1:5000/tasks")
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("failed to fetch all tasks")
+            }
+            return response.json();
+        })
+        .then((data) => setAllTasks(data))
+        .catch((error) => console.error("Error fetching tasks:", error));
+    }, []);
 
 
     const handleEditClick = (task) => {
