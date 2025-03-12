@@ -6,13 +6,10 @@ function App() {
 
   const [taskName, setTaskName] = useState("");
 
-
-
   // submit new task
   const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`the name you entered was: ${taskName}`);
-
+    // alert(`the name you entered was: ${taskName}`);
     try{
       const response = await fetch("http://127.0.0.1:5000/task", {
         method: "POST",
@@ -37,11 +34,11 @@ function App() {
 
   return (
     <div className="App">
-      this is the to do list app
+      <h1>TO DO or NOT TO DO</h1>
       <div className='inputs-wrapper'>
         <form onSubmit={handleSubmit}>
           <label>
-            New Task:
+            New Task: 
             <input 
               type='text' 
               value={taskName}
@@ -51,7 +48,9 @@ function App() {
           <input type='submit' />
         </form>
       </div>
-      <AllTasks/>
+      <AllTasks
+      taskName={taskName}
+      />
     </div>
   );
 }

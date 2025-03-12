@@ -1,7 +1,7 @@
 import './styles/App.css';
 import { useState, useEffect } from 'react';
 
-function AllTasks() {
+function AllTasks(taskName) {
 
 
     const [allTasks, setAllTasks] = useState([]);
@@ -21,7 +21,7 @@ function AllTasks() {
         })
         .then((data) => setAllTasks(data))
         .catch((error) => console.error("Error fetching tasks:", error));
-    }, []);
+    }, [taskName]);
 
 
     const handleEditClick = (task) => {
