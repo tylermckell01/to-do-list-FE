@@ -3,15 +3,14 @@ import { useState, useEffect } from 'react';
 
 function AllTasks(taskName) {
 
-
     const [allTasks, setAllTasks] = useState([]);
     const [editingTaskId, setEditingTaskId] = useState(null);
     const [editedTaskName, setEditedTaskName] = useState("");
     const [editedTaskStatus, setEditedTaskStatus] = useState("");
 
 
-    // fetch all tasks
-    useEffect(() => {
+    // fetch all tasks function
+    const fetchTasks = () => {
         fetch("http://127.0.0.1:5000/tasks")
         .then((response) => {
             if (!response.ok) {
@@ -21,7 +20,42 @@ function AllTasks(taskName) {
         })
         .then((data) => setAllTasks(data))
         .catch((error) => console.error("Error fetching tasks:", error));
+    }
+
+    // fetch all tasks useeffect
+    useEffect(() => {
+        fetchTasks()
     }, [taskName]);
+
+    const updateTask = async () => {
+    
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/task/${editingTaskId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    task_name: editedTaskName, 
+                    task_status: editedTaskStatus
+                }),
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to edit task: ${response.status} - ${errorText}`);
+            }
+    
+            const updatedTask = await response.json();
+            console.log("Task edited successfully:", updatedTask);
+    
+            fetchTasks()
+    
+        } catch (error) {
+            console.error("Error editing task:", error);
+        }
+    };
+    
 
 
     const handleEditClick = (task) => {
@@ -31,11 +65,7 @@ function AllTasks(taskName) {
     };
 
     const handleSaveClick = () => {
-        setAllTasks(prevTasks =>
-            prevTasks.map(task =>
-                task.task_id === editingTaskId ? { ...task, task_name: editedTaskName, task_status: editedTaskStatus } : task
-            )
-        )
+        updateTask();
         setEditingTaskId(null);
     };
 
@@ -59,7 +89,7 @@ function AllTasks(taskName) {
                             <option value="in progress">In Progress</option>
                             <option value="completed">Completed</option>
                         </select>
-                        <button onClick={handleSaveClick}>Save</button>
+                        <button onClick={() => handleSaveClick(editingTaskId)}>Save</button>
                         <button onClick={() => setEditingTaskId(null)}>Cancel</button>
                     </>
                 ) : (
