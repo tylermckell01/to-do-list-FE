@@ -98,17 +98,27 @@ function AllTasks(handleSubmit) {
         setEditingTaskId(null);
     };
 
-    // order by function
-    const filteredTasks = allTasks.filter((task) => 
-        task.task_status.toLowerCase().includes(taskOrder.toLowerCase())
-    );
+    // filter function
+    const filterTasks = (e) => {
+        setTaskOrder(e.target.value);
+        (console.log(allTasks));
+
+    }
+
+    const filteredTasks = 
+        taskOrder !== "Filter by"
+        ? allTasks.filter((task) => 
+            task.task_status.toLowerCase().includes(taskOrder.toLowerCase())
+        )
+        : allTasks;
+
     
 
   return (
     <div className="App">
         <h1>Here are all your tasks</h1>
-        <select value={taskOrder} onChange={(console.log(allTasks), (e) => setTaskOrder(e.target.value))}>
-            <option value="Order By">Order By</option>
+        <select value={taskOrder} onChange={(e) => filterTasks(e)}>
+            <option value="Filter By">Filter by</option>
             <option value="New">New</option>
             <option value="In Progress">In Progress</option>
             <option value="Complete">Complete</option>
