@@ -1,12 +1,14 @@
 import './styles/App.css';
 import { useState, useEffect } from 'react';
 
-function AllTasks(taskName) {
+function AllTasks(handleSubmit) {
 
     const [allTasks, setAllTasks] = useState([]);
     const [editingTaskId, setEditingTaskId] = useState(null);
     const [editedTaskName, setEditedTaskName] = useState("");
     const [editedTaskStatus, setEditedTaskStatus] = useState("");
+    const [taskOrder, setTaskOrder] = useState("");
+
 
 
     // fetch all tasks function
@@ -22,11 +24,12 @@ function AllTasks(taskName) {
         .catch((error) => console.error("Error fetching tasks:", error));
     }
 
-    // fetch all tasks useeffect
+    // fetch all tasks on any task updates useeffect
     useEffect(() => {
         fetchTasks()
-    }, [taskName]);
+    }, [handleSubmit]);
 
+    // Update task
     const updateTask = async () => {
     
         try {
@@ -56,26 +59,62 @@ function AllTasks(taskName) {
         }
     };
     
+    // Delete task
+    const deleteTask = async (taskId) => {
+        console.log(taskId)
+    
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/task/${taskId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to delete task: ${response.status} - ${errorText}`);
+            }
+    
+            console.log("Task deleted successfully");
+    
+            fetchTasks()
+    
+        } catch (error) {
+            console.error("Error deleting task:", error);
+        }
+    };
 
-
+    // on edit button click
     const handleEditClick = (task) => {
         setEditingTaskId(task.task_id);
         setEditedTaskName(task.task_name);
         setEditedTaskStatus(task.task_status);
     };
 
+    // on save button click
     const handleSaveClick = () => {
         updateTask();
         setEditingTaskId(null);
     };
 
-
+    // order by function
+    const filteredTasks = allTasks.filter((task) => 
+        task.task_status.toLowerCase().includes(taskOrder.toLowerCase())
+    );
+    
 
   return (
     <div className="App">
         <h1>Here are all your tasks</h1>
+        <select value={taskOrder} onChange={(console.log(allTasks), (e) => setTaskOrder(e.target.value))}>
+            <option value="Order By">Order By</option>
+            <option value="New">New</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Complete">Complete</option>
+        </select>
         <ul>
-            {allTasks.map(task => (
+            {filteredTasks.map(task => (
                 <li key={task.task_id}>
                 {editingTaskId === task.task_id ? (
                     <>
@@ -85,9 +124,9 @@ function AllTasks(taskName) {
                             onChange={(e) => setEditedTaskName(e.target.value)}
                         />
                         <select value={editedTaskStatus} onChange={(e) => setEditedTaskStatus(e.target.value)}>
-                            <option value="pending">Pending</option>
-                            <option value="in progress">In Progress</option>
-                            <option value="completed">Completed</option>
+                            <option value="New">New</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Complete">Completed</option>
                         </select>
                         <button onClick={() => handleSaveClick(editingTaskId)}>Save</button>
                         <button onClick={() => setEditingTaskId(null)}>Cancel</button>
@@ -96,6 +135,7 @@ function AllTasks(taskName) {
                     <>
                         {task.task_name} - <strong>{task.task_status}</strong>
                         <button onClick={() => handleEditClick(task)}>Edit</button>
+                        <button onClick={() => deleteTask(task.task_id)}>Delete</button>
                     </>
                 )}
             </li>

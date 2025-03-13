@@ -49,7 +49,7 @@ function App() {
         </form>
       </div>
       <AllTasks
-      taskName={taskName}
+      handleSubmit={handleSubmit}
       />
     </div>
   );
